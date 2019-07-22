@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">LedControl</string>
+    <string name="tab_text_1">Control</string>
+    <string name="tab_text_2">Favourites</string>
+    <string name="color_palette">color_palette</string>
+    <string name="intensity">Intensity</string>
+</resources>
