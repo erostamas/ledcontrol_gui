@@ -1,5 +1,7 @@
 package com.erostamas.ledcontrol.ui.main;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -13,12 +15,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
-import android.widget.TextView;
-import android.support.annotation.Nullable;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.preference.PreferenceManager;
 
 import com.erostamas.ledcontrol.R;
 import com.erostamas.ledcontrol.UdpMessage;
@@ -66,7 +69,10 @@ public class MainFragment extends Fragment {
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 Log.i("ledcontrol", "Intensity progress changed to : " + seekBar.getProgress());
 
-                UdpMessage udpMessage = new UdpMessage("192.168.1.247", 50001, "setintensity " + Integer.toString(seekBar.getProgress()));
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                String controllerIpAddress = prefs.getString("controller_ip_address", "192.168.1.247");
+
+                UdpMessage udpMessage = new UdpMessage(controllerIpAddress, 50001, "setintensity " + Integer.toString(seekBar.getProgress()));
                 UdpSender sender = new UdpSender();
                 sender.execute(udpMessage);
             }
@@ -118,7 +124,11 @@ public class MainFragment extends Fragment {
                     String red = Integer.toString(Color.red(touchedRGB));
                     String green = Integer.toString(Color.green(touchedRGB));
                     String blue = Integer.toString(Color.blue(touchedRGB));
-                    UdpMessage udpMessage = new UdpMessage("192.168.1.247", 50001, "setcolor " + red + " " + green + " " + blue);
+
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    String controllerIpAddress = prefs.getString("controller_ip_address", "192.168.1.247");
+
+                    UdpMessage udpMessage = new UdpMessage(controllerIpAddress, 50001, "setcolor " + red + " " + green + " " + blue);
                     UdpSender sender = new UdpSender();
                     sender.execute(udpMessage);
                 }
