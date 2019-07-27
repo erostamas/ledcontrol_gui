@@ -23,6 +23,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
 
+import com.erostamas.ledcontrol.CommandSender;
 import com.erostamas.ledcontrol.R;
 import com.erostamas.ledcontrol.UdpMessage;
 import com.erostamas.ledcontrol.UdpSender;
@@ -69,12 +70,7 @@ public class MainFragment extends Fragment {
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 Log.i("ledcontrol", "Intensity progress changed to : " + seekBar.getProgress());
 
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                String controllerIpAddress = prefs.getString("controller_ip_address", "192.168.1.247");
-
-                UdpMessage udpMessage = new UdpMessage(controllerIpAddress, 50001, "setintensity " + Integer.toString(seekBar.getProgress()));
-                UdpSender sender = new UdpSender();
-                sender.execute(udpMessage);
+                CommandSender.setIntensity(getActivity(), seekBar.getProgress());
             }
 
             @Override
@@ -121,16 +117,8 @@ public class MainFragment extends Fragment {
                     }
 
                     int touchedRGB = bitmap.getPixel(x, y);
-                    String red = Integer.toString(Color.red(touchedRGB));
-                    String green = Integer.toString(Color.green(touchedRGB));
-                    String blue = Integer.toString(Color.blue(touchedRGB));
 
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                    String controllerIpAddress = prefs.getString("controller_ip_address", "192.168.1.247");
-
-                    UdpMessage udpMessage = new UdpMessage(controllerIpAddress, 50001, "setcolor " + red + " " + green + " " + blue);
-                    UdpSender sender = new UdpSender();
-                    sender.execute(udpMessage);
+                    CommandSender.setColor(getActivity(), Color.red(touchedRGB), Color.green(touchedRGB), Color.blue(touchedRGB));
                 }
                 return true;
             }
