@@ -32,15 +32,18 @@ import com.erostamas.ledcontrol.RGBColor;
 import com.erostamas.ledcontrol.UdpMessage;
 import com.erostamas.ledcontrol.UdpSender;
 
+import java.util.ArrayList;
+
 /**
  * A placeholder fragment containing a simple view.
  */
 public class FavouritesFragment extends Fragment implements FavouritesRecyclerViewAdapter.ItemClickListener {
 
     private static final String ARG_SECTION_NUMBER = "section_number";
+    public static ArrayList<RGBColor> favourites = new ArrayList<RGBColor>();
 
     private PageViewModel pageViewModel;
-    FavouritesRecyclerViewAdapter adapter;
+    public FavouritesRecyclerViewAdapter adapter;
 
     public static FavouritesFragment newInstance(int index) {
         FavouritesFragment fragment = new FavouritesFragment();
@@ -67,23 +70,25 @@ public class FavouritesFragment extends Fragment implements FavouritesRecyclerVi
             Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_favourites, container, false);
 
-        // data to populate the RecyclerView with
-        RGBColor[] data = {new RGBColor(0,0,0), new RGBColor(255, 0, 0), new RGBColor(0, 255, 0), new RGBColor(0, 0, 255)};
-
         // set up the RecyclerView
         RecyclerView recyclerView = rootView.findViewById(R.id.recycler_view);
         int numberOfColumns = 6;
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), numberOfColumns));
-        adapter = new FavouritesRecyclerViewAdapter(getActivity(), data);
+        adapter = new FavouritesRecyclerViewAdapter(getActivity(), favourites);
         adapter.setClickListener(this);
+        adapter.notifyDataSetChanged();
         recyclerView.setAdapter(adapter);
+
+
         return rootView;
     }
+
+
 
     @Override
     public void onItemClick(View view, int position) {
         RGBColor item = adapter.getItem(position);
         CommandSender.setColor(getActivity(), item._red, item._green, item._blue);
-        Log.i("TAG", "You clicked number " + adapter.getItem(position) + ", which is at cell position " + position);
+        //Log.i("TAG", "You clicked number " + adapter.getItem(position) + ", which is at cell position " + position);
     }
 }

@@ -18,7 +18,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @StringRes
     private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2};
     private final Context mContext;
-
+    public static FavouritesFragment favouritesFragment = null;
     public SectionsPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
         mContext = context;
@@ -31,7 +31,11 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         if (position == 0) {
             return MainFragment.newInstance(position + 1);
         } else {
-            return FavouritesFragment.newInstance(position + 1);
+
+            if (favouritesFragment == null) {
+                favouritesFragment = FavouritesFragment.newInstance(position + 1);
+            }
+            return favouritesFragment;
         }
     }
 

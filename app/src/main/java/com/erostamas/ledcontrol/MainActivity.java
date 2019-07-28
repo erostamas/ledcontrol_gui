@@ -1,20 +1,33 @@
 package com.erostamas.ledcontrol;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+
+import com.erostamas.ledcontrol.ui.main.FavouritesFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
+
+import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.erostamas.ledcontrol.ui.main.SectionsPagerAdapter;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.HashMap;
+import java.util.Map;
+
+public class MainActivity extends AppCompatActivity implements RedisResponseUser{
+
+    private Map<String, String> _redisContent = new HashMap<String, String>() {{}};
+    private View _view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +45,10 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                _view = view;
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                String controllerIpAddress = prefs.getString("controller_ip_address", "192.168.1.247");
+                new RedisClient(controllerIpAddress, "ledcontrol_process_data", _redisContent, MainActivity.this).execute();
             }
         });
     }
@@ -56,5 +71,13 @@ public class MainActivity extends AppCompatActivity {
                 // Do nothing
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onRedisReplyReceived() {
+        FavouritesFragment.favourites.add(new RGBColor(Integer.parseInt(_redisContent.get("red")), Integer.parseInt(_redisContent.get("green")), Integer.parseInt(_redisContent.get("blue"))));
+        SectionsPagerAdapter.favouritesFragment.adapter.notifyDataSetChanged();
+        Snackbar.make(_view, "Added color to favourites (" + _redisContent.get("red") + "," + _redisContent.get("green") + "," + _redisContent.get("blue"), Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
     }
 }

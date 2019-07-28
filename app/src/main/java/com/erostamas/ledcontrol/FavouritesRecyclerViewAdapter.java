@@ -11,14 +11,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+
 public class FavouritesRecyclerViewAdapter extends RecyclerView.Adapter<FavouritesRecyclerViewAdapter.ViewHolder> {
 
-    private RGBColor[] mData;
+    private ArrayList<RGBColor> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
     // data is passed into the constructor
-    public FavouritesRecyclerViewAdapter(Context context, RGBColor[] data) {
+    public FavouritesRecyclerViewAdapter(Context context, ArrayList<RGBColor> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
@@ -34,14 +36,14 @@ public class FavouritesRecyclerViewAdapter extends RecyclerView.Adapter<Favourit
     // binds the data to the TextView in each cell
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.rootView.setBackgroundColor(Color.rgb(mData[position]._red , mData[position]._green,  mData[position]._blue));
+        holder.rootView.setBackgroundColor(Color.rgb(mData.get(position)._red , mData.get(position)._green,  mData.get(position)._blue));
 
     }
 
     // total number of cells
     @Override
     public int getItemCount() {
-        return mData.length;
+        return mData.size();
     }
 
 
@@ -63,7 +65,7 @@ public class FavouritesRecyclerViewAdapter extends RecyclerView.Adapter<Favourit
 
     // convenience method for getting data at click position
     public RGBColor getItem(int id) {
-        return mData[id];
+        return mData.get(id);
     }
 
     // allows clicks events to be caught
