@@ -9,10 +9,13 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 
@@ -74,16 +77,13 @@ public class FavouritesFragment extends Fragment implements FavouritesRecyclerVi
         RecyclerView recyclerView = rootView.findViewById(R.id.recycler_view);
         int numberOfColumns = 6;
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), numberOfColumns));
-        adapter = new FavouritesRecyclerViewAdapter(getActivity(), favourites);
+        adapter = new FavouritesRecyclerViewAdapter(getActivity(), favourites, this);
         adapter.setClickListener(this);
         adapter.notifyDataSetChanged();
         recyclerView.setAdapter(adapter);
 
-
         return rootView;
     }
-
-
 
     @Override
     public void onItemClick(View view, int position) {
