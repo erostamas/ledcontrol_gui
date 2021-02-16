@@ -89,34 +89,25 @@ public class MainFragment extends Fragment {
                     // Write your awesome code here
                     float eventX = event.getX();
                     float eventY = event.getY();
-                    float[] eventXY = new float[] {eventX, eventY};
-
-                    Matrix invertMatrix = new Matrix();
-                    ((ImageView)v).getImageMatrix().invert(invertMatrix);
-
-                    invertMatrix.mapPoints(eventXY);
-                    int x = Integer.valueOf((int)eventXY[0]);
-                    int y = Integer.valueOf((int)eventXY[1]);
-
 
                     Drawable imgDrawable;
-                    imgDrawable = ((ImageView)v).getDrawable();
+                    ImageView imageView = (ImageView)v;
+                    imgDrawable = imageView.getDrawable();
                     Bitmap bitmap = ((BitmapDrawable)imgDrawable).getBitmap();
 
-                    //Limit x, y range within bitmap
-                    if(x < 0){
-                        x = 0;
-                    }else if(x > bitmap.getWidth()-1){
-                        x = bitmap.getWidth()-1;
+                    if(eventX < 0){
+                        eventX = 0;
+                    }else if(eventX > v.getWidth()-1){
+                        eventX = imageView.getWidth()-1;
                     }
 
-                    if(y < 0){
-                        y = 0;
-                    }else if(y > bitmap.getHeight()-1){
-                        y = bitmap.getHeight()-1;
+                    if(eventY < 0){
+                        eventY = 0;
+                    }else if(eventY > imageView.getHeight()-1){
+                        eventY = imageView.getHeight()-1;
                     }
 
-                    int touchedRGB = bitmap.getPixel(x, y);
+                    int touchedRGB = bitmap.getPixel(bitmap.getWidth() * Math.round(eventX) / imageView.getWidth(), bitmap.getHeight() * Math.round(eventY) / imageView.getHeight());
 
                     CommandSender.setColor(getActivity(), Color.red(touchedRGB), Color.green(touchedRGB), Color.blue(touchedRGB));
                 }
