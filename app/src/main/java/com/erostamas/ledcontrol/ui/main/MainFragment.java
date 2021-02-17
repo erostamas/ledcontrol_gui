@@ -7,12 +7,14 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 
@@ -27,6 +29,15 @@ import com.erostamas.ledcontrol.CommandSender;
 import com.erostamas.ledcontrol.R;
 import com.erostamas.ledcontrol.UdpMessage;
 import com.erostamas.ledcontrol.UdpSender;
+
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -63,6 +74,7 @@ public class MainFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         SeekBar intensityBar = (SeekBar) rootView.findViewById(R.id.seekBarIntensity);
         final ImageView colorPalette = (ImageView) rootView.findViewById(R.id.colorPalette);
+        final Button onOffSwitch = (Button) rootView.findViewById(R.id.onOffSwitch);
         intensityBar.setMax(100);
 
         intensityBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -115,6 +127,84 @@ public class MainFragment extends Fragment {
             }
         };
         colorPalette.setOnTouchListener(colorPaletteClickListener);
+
+        View.OnTouchListener onOffSwitchClickListener = new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                if (v.equals(onOffSwitch) && event.getAction() == MotionEvent.ACTION_UP) {
+                    Log.i("click", "hellobello");
+                    AsyncTaskRunner postReq = new AsyncTaskRunner();
+                    postReq.execute("start");
+                }
+                return true;
+            }
+        };
+        onOffSwitch.setOnTouchListener(onOffSwitchClickListener);
         return rootView;
     }
+
+    private class AsyncTaskRunner extends AsyncTask<String,String,String> {
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                Log.i("click", "asynctaskrunning");
+                String infoUrlStr="http://192.168.1.38:8081/zeroconf/info";
+                URL infoUrl=new URL(infoUrlStr);
+
+                HttpURLConnection con = (HttpURLConnection) infoUrl.openConnection();
+                con.setDoOutput(true);
+                con.setDoInput(true);
+                con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                con.setRequestMethod("POST");
+                con.setRequestProperty("Accept", "application/json");
+
+                JSONObject data = new JSONObject();
+                data.put("switch","off");
+
+                JSONObject payload = new JSONObject();
+                payload.put("deviceid","1000a0866a");
+                payload.put("data", data);
+
+                DataOutputStream localDataOutputStream = new DataOutputStream(con.getOutputStream());
+                localDataOutputStream.writeBytes(payload.toString());
+                localDataOutputStream.flush();
+                localDataOutputStream.close();
+
+                try(BufferedReader br = new BufferedReader(
+                        new InputStreamReader(con.getInputStream(), "utf-8"))) {
+                    StringBuilder response = new StringBuilder();
+                    String responseLine = null;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    Log.i("click", response.toString());
+                    JSONObject mainObject = new JSONObject(response.toString());
+                    Log.i("click", "data is: " + mainObject.getString("data"));
+                    JSONObject dataObject = new JSONObject(mainObject.getString("data"));
+                    Log.i("click", "switch is: " + dataObject.getString("switch"));
+                }
+
+
+            }
+            catch (Exception e){
+                Log.v("ErrorAPP",e.toString());
+            }
+            return "";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+        }
+    }
 }
+

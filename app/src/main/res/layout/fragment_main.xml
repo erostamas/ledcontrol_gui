@@ -38,4 +38,11 @@
         android:contentDescription="@string/color_palette"
         app:srcCompat="@drawable/color_palette" />
 
+    <Button
+        android:id="@+id/onOffSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/colorPalette"
+        android:text="Button" />
+
 </RelativeLayout>
