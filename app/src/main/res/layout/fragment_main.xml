@@ -38,11 +38,16 @@
         android:contentDescription="@string/color_palette"
         app:srcCompat="@drawable/color_palette" />
 
-    <Button
-        android:id="@+id/onOffSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/colorPalette"
-        android:text="Button" />
+    <ToggleButton
+        android:id="@+id/powerButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@drawable/power_toggle_selector"
+        android:textOff=""
+        android:textOn=""
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="20dp"/>
 
 </RelativeLayout>

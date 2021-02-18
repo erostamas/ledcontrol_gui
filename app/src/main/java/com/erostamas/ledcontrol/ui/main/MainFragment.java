@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.ToggleButton;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
@@ -27,6 +28,8 @@ import androidx.preference.PreferenceManager;
 
 import com.erostamas.ledcontrol.CommandSender;
 import com.erostamas.ledcontrol.R;
+import com.erostamas.ledcontrol.SonoffSwitchUtils;
+import com.erostamas.ledcontrol.TogglePowerTask;
 import com.erostamas.ledcontrol.UdpMessage;
 import com.erostamas.ledcontrol.UdpSender;
 
@@ -74,7 +77,7 @@ public class MainFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         SeekBar intensityBar = (SeekBar) rootView.findViewById(R.id.seekBarIntensity);
         final ImageView colorPalette = (ImageView) rootView.findViewById(R.id.colorPalette);
-        final Button onOffSwitch = (Button) rootView.findViewById(R.id.onOffSwitch);
+        final ToggleButton onOffSwitch = (ToggleButton) rootView.findViewById(R.id.powerButton);
         intensityBar.setMax(100);
 
         intensityBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -132,68 +135,41 @@ public class MainFragment extends Fragment {
             public boolean onTouch(View v, MotionEvent event) {
                 if (v.equals(onOffSwitch) && event.getAction() == MotionEvent.ACTION_UP) {
                     Log.i("click", "hellobello");
-                    AsyncTaskRunner postReq = new AsyncTaskRunner();
+                    TogglePowerTask postReq = new TogglePowerTask();
                     postReq.execute("start");
+                    ToggleButton btn = (ToggleButton)(v);
+                    btn.setChecked(!btn.isChecked());
+                    //Log.i("click", "ischecked: " + btn.isChecked());
                 }
                 return true;
             }
         };
         onOffSwitch.setOnTouchListener(onOffSwitchClickListener);
+        GetSwitchStateTask getSwitchStateTask = new GetSwitchStateTask(onOffSwitch);
+        getSwitchStateTask.execute("start");
         return rootView;
     }
 
-    private class AsyncTaskRunner extends AsyncTask<String,String,String> {
+    private class GetSwitchStateTask extends AsyncTask<String,String,String> {
+
+        private ToggleButton _toggleButton;
+
+        public GetSwitchStateTask(ToggleButton toggleButton) {
+            _toggleButton = toggleButton;
+        }
         @Override
         protected String doInBackground(String... params) {
-            try {
-                Log.i("click", "asynctaskrunning");
-                String infoUrlStr="http://192.168.1.38:8081/zeroconf/info";
-                URL infoUrl=new URL(infoUrlStr);
-
-                HttpURLConnection con = (HttpURLConnection) infoUrl.openConnection();
-                con.setDoOutput(true);
-                con.setDoInput(true);
-                con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                con.setRequestMethod("POST");
-                con.setRequestProperty("Accept", "application/json");
-
-                JSONObject data = new JSONObject();
-                data.put("switch","off");
-
-                JSONObject payload = new JSONObject();
-                payload.put("deviceid","1000a0866a");
-                payload.put("data", data);
-
-                DataOutputStream localDataOutputStream = new DataOutputStream(con.getOutputStream());
-                localDataOutputStream.writeBytes(payload.toString());
-                localDataOutputStream.flush();
-                localDataOutputStream.close();
-
-                try(BufferedReader br = new BufferedReader(
-                        new InputStreamReader(con.getInputStream(), "utf-8"))) {
-                    StringBuilder response = new StringBuilder();
-                    String responseLine = null;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-                    Log.i("click", response.toString());
-                    JSONObject mainObject = new JSONObject(response.toString());
-                    Log.i("click", "data is: " + mainObject.getString("data"));
-                    JSONObject dataObject = new JSONObject(mainObject.getString("data"));
-                    Log.i("click", "switch is: " + dataObject.getString("switch"));
-                }
-
-
-            }
-            catch (Exception e){
-                Log.v("ErrorAPP",e.toString());
-            }
-            return "";
+            return SonoffSwitchUtils.getSwitchState("192.168.1.38", "1000a0866a");
         }
 
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            if(s.equals("on")) {
+                _toggleButton.setChecked(true);
+            } else {
+                _toggleButton.setChecked(false);
+            }
         }
 
         @Override

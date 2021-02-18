@@ -133,5 +133,4 @@ public class MainActivity extends AppCompatActivity implements RedisResponseUser
             e.printStackTrace();
         }
     }
-
 }
