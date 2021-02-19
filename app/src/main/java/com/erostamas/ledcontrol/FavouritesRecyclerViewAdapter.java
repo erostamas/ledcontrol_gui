@@ -61,7 +61,7 @@ public class FavouritesRecyclerViewAdapter extends RecyclerView.Adapter<Favourit
 
         ViewHolder(View itemView) {
             super(itemView);
-            rootView = (LinearLayout)itemView.findViewById(R.id.root_layout);
+            rootView = (LinearLayout)itemView.findViewById(R.id.favourite_item_root_layout);
             itemView.setOnClickListener(this);
             itemView.setOnCreateContextMenuListener(mOnCreateContextMenuListener);
         }
@@ -89,8 +89,6 @@ public class FavouritesRecyclerViewAdapter extends RecyclerView.Adapter<Favourit
                 return true;
             }
         };
-
-
     }
 
     // convenience method for getting data at click position

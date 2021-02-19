@@ -134,12 +134,10 @@ public class MainFragment extends Fragment {
         View.OnTouchListener onOffSwitchClickListener = new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
                 if (v.equals(onOffSwitch) && event.getAction() == MotionEvent.ACTION_UP) {
-                    Log.i("click", "hellobello");
                     TogglePowerTask postReq = new TogglePowerTask();
                     postReq.execute("start");
                     ToggleButton btn = (ToggleButton)(v);
                     btn.setChecked(!btn.isChecked());
-                    //Log.i("click", "ischecked: " + btn.isChecked());
                 }
                 return true;
             }
