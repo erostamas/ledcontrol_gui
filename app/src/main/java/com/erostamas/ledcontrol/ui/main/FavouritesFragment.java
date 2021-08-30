@@ -78,7 +78,6 @@ public class FavouritesFragment extends Fragment implements FavouritesRecyclerVi
         int numberOfColumns = 6;
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), numberOfColumns));
         adapter = new FavouritesRecyclerViewAdapter(getActivity(), favourites, this);
-        adapter.setClickListener(this);
         adapter.notifyDataSetChanged();
         recyclerView.setAdapter(adapter);
 
